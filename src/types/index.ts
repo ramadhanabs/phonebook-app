@@ -15,3 +15,8 @@ export interface IContact {
 export interface ContactResponse {
   contact: IContact[]
 }
+
+export interface UpdateFormParamsType<T> {
+  id: number | undefined
+  _set: T
+}

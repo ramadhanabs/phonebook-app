@@ -3,6 +3,10 @@
 
 import React from "react"
 import { jsx, css } from "@emotion/react"
+import useDBContacts from "@/hooks/useDBContacts"
+import Link from "next/link"
+import ContentLoader from "@/components/elements/ContentLoader"
+import fakeImage from "@/helpers/fakeImage"
 
 const heroStyle = css`
   background: url("/bg-homepage.webp");
@@ -97,24 +101,56 @@ const sliderWrapperStyle = css`
 `
 
 const HeroSlider = () => {
+  const { data, isLoading } = useDBContacts({ enabled: true })
+
+  const cardRenderer = () => {
+    if (isLoading) {
+      return (
+        <>
+          {Array.from(Array(5).keys()).map((_, idx) => (
+            <div css={favoriteCardStyle} key={idx}>
+              <ContentLoader width="100%" height="120px" />
+              <div className="content">
+                <ContentLoader height="8px" width="60px" />
+                <ContentLoader height="8px" width="40px" />
+              </div>
+            </div>
+          ))}
+        </>
+      )
+    } else {
+      return (
+        <>
+          {data.map((item, idx) => (
+            <div css={favoriteCardStyle} key={idx}>
+              <div style={{ padding: "20px", paddingBottom: 0 }}>
+                <img src={fakeImage("notionists")} />
+              </div>
+              <div className="content">
+                <p className="title">
+                  {item.first_name} {item.last_name}
+                </p>
+                <p className="subtitle">+6282227804252</p>
+              </div>
+            </div>
+          ))}
+        </>
+      )
+    }
+  }
+
+  if (data.length === 0) return <></>
+
   return (
     <div css={heroStyle}>
       <div className="no-scrollbar" css={sliderWrapperStyle}>
         <img src="/your-favorite-contact.png" width="120px" />
-        {Array.from(Array(4).keys()).map((_, idx) => (
-          <div css={favoriteCardStyle} key={idx}>
-            <div style={{ padding: "20px", paddingBottom: 0 }}>
-              <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Sophie" />
-            </div>
-            <div className="content">
-              <p className="title">Ramadhana Bagus</p>
-              <p className="subtitle">+6282227804252</p>
-            </div>
-          </div>
-        ))}
+        {cardRenderer()}
         <div css={lastFavoriteCardStyle}>
           <p className="title">Wanna see other contacts?</p>
-          <button>See All</button>
+          <Link href="/favorite">
+            <button>See All</button>
+          </Link>
         </div>
       </div>
     </div>

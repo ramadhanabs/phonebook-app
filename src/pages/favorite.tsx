@@ -6,7 +6,8 @@ import MetaData from "@/components/MetaData"
 import ContactList from "@/components/modules/ContactList/ContactList"
 import isMobile from "@/helpers/isMobile"
 import { GetServerSideProps } from "next"
-import React from "react"
+import React, { useEffect } from "react"
+import { getAll } from "@/db/favorite"
 
 const recentFavoriteStyle = css`
   padding-top: 20px;
@@ -26,6 +27,7 @@ const FavoritePage = () => {
 
       <div css={recentFavoriteStyle}>
         <h1>Recent Favorite</h1>
+
         <ContactList type="favorite" />
       </div>
     </>

@@ -7,9 +7,15 @@ import React, { useEffect, useState } from "react"
 import ContactCard from "../ContactCard/ContactCard"
 import { ContactListType } from "./ContactList"
 import { ChevronRightIcon } from "@heroicons/react/24/outline"
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid"
+import { PencilSquareIcon, TrashIcon, HeartIcon } from "@heroicons/react/24/solid"
 import ContactForm from "../ContactForm/ContactForm"
 import { IContact } from "@/types"
+import { useMutation } from "urql"
+import { DELETE_CONTACT } from "@/graphql/mutations"
+import toast from "react-hot-toast"
+import PrimaryButton from "@/components/elements/Button/PrimaryButton"
+import useDBContacts from "@/hooks/useDBContacts"
+import { motion } from "framer-motion"
 
 const baseBottomSheetStyle = css`
   .wrapper-contact-detail {
@@ -69,8 +75,7 @@ const baseBottomSheetStyle = css`
 
     button.action {
       background: white;
-      outline: 1px solid #d6dfeb;
-      outline-offset: -1px;
+      border: 1px solid #d6dfeb;
       border-radius: 8px;
       padding: 12px;
 
@@ -140,11 +145,47 @@ interface ModalContactDetailProps {
   onClose: () => void
   type?: ContactListType
   selectedContact?: IContact
+  refetch: () => void
 }
 
 const ModalContactDetail = (props: ModalContactDetailProps) => {
-  const { isOpen, onClose, selectedContact } = props
+  const { isOpen, onClose, selectedContact, refetch, type } = props
   const [detailMode, setDetailMode] = useState<string>("")
+
+  const { storeContact, deleteContact } = useDBContacts({ enabled: false })
+
+  const [deleteContactResult, deleteContactMutation] = useMutation(DELETE_CONTACT)
+  const { fetching: loadingDelete } = deleteContactResult
+
+  const handleFavorite = async () => {
+    await storeContact(selectedContact)
+    onClose()
+    refetch()
+    toast.success("Success add to favorite")
+  }
+
+  const handleRemoveFavorite = async () => {
+    await deleteContact(selectedContact?.id ?? 0)
+    onClose()
+    refetch()
+    toast.success("Success removing from favorite")
+  }
+
+  const onDelete = () => {
+    deleteContactMutation({
+      id: selectedContact?.id,
+    })
+      .then(result => {
+        if (!result.error) {
+          toast.success("Success delete contact")
+          onClose()
+          refetch()
+        }
+      })
+      .catch(error => {
+        toast.error(error.message)
+      })
+  }
 
   useEffect(() => {
     if (!isOpen) {
@@ -152,37 +193,81 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
     }
   }, [isOpen])
 
-  const contactButtonRenderer = () => (
-    <div className="button-action-wrapper">
-      <button className="action" onClick={() => setDetailMode("edit")}>
-        <div className="content-wrapper">
-          <div className="icon-wrapper-edit">
-            <PencilSquareIcon className="icon-edit" />
-          </div>
+  const contactButtonRenderer = () => {
+    if (type === "favorite") {
+      return (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="button-action-wrapper"
+        >
+          <button className="action" onClick={handleRemoveFavorite}>
+            <div className="content-wrapper">
+              <div className="icon-wrapper-delete">
+                <TrashIcon className="icon-delete" />
+              </div>
 
-          <div>
-            <p className="title">Edit Contact</p>
-            <p className="subtitle">Edit your existing data by clicking this button.</p>
-          </div>
-        </div>
-        <ChevronRightIcon className="icon-chevron" />
-      </button>
+              <div>
+                <p className="title">Remove from Favorite</p>
+                <p className="subtitle">When someone no longer special to you</p>
+              </div>
+            </div>
+            <ChevronRightIcon className="icon-chevron" />
+          </button>
+        </motion.div>
+      )
+    } else {
+      return (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="button-action-wrapper"
+        >
+          <button className="action" onClick={handleFavorite}>
+            <div className="content-wrapper">
+              <div className="icon-wrapper-edit">
+                <HeartIcon className="icon-edit" />
+              </div>
 
-      <button className="action" onClick={() => setDetailMode("delete")}>
-        <div className="content-wrapper">
-          <div className="icon-wrapper-delete">
-            <TrashIcon className="icon-delete" />
-          </div>
+              <div>
+                <p className="title">Favorite</p>
+                <p className="subtitle">Save this contact as your favorite one.</p>
+              </div>
+            </div>
+            <ChevronRightIcon className="icon-chevron" />
+          </button>
 
-          <div>
-            <p className="title">Delete Contact</p>
-            <p className="subtitle">Remove this entry by clicking this button.</p>
-          </div>
-        </div>
-        <ChevronRightIcon className="icon-chevron" />
-      </button>
-    </div>
-  )
+          <button className="action" onClick={() => setDetailMode("edit")}>
+            <div className="content-wrapper">
+              <div className="icon-wrapper-edit">
+                <PencilSquareIcon className="icon-edit" />
+              </div>
+
+              <div>
+                <p className="title">Edit Contact</p>
+                <p className="subtitle">Wrong name? Just edit them here.</p>
+              </div>
+            </div>
+            <ChevronRightIcon className="icon-chevron" />
+          </button>
+
+          <button className="action" onClick={() => setDetailMode("delete")}>
+            <div className="content-wrapper">
+              <div className="icon-wrapper-delete">
+                <TrashIcon className="icon-delete" />
+              </div>
+
+              <div>
+                <p className="title">Delete Contact</p>
+                <p className="subtitle">Cut-off does not mean you hate them.</p>
+              </div>
+            </div>
+            <ChevronRightIcon className="icon-chevron" />
+          </button>
+        </motion.div>
+      )
+    }
+  }
 
   const deleteConfirmationRenderer = () => {
     return (
@@ -190,7 +275,9 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
         <p className="title">Are you sure to delete this contact?</p>
 
         <div className="button-confirmation-wrapper">
-          <button>Yes</button>
+          <PrimaryButton type="button" isLoading={loadingDelete} onClick={onDelete}>
+            Yes
+          </PrimaryButton>
           <button onClick={() => setDetailMode("")}>No</button>
         </div>
       </div>
@@ -200,7 +287,7 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
   const contentRenderer = () => {
     switch (detailMode) {
       case "edit":
-        return <ContactForm isEditForm onClose={onClose} />
+        return <ContactForm isEditForm data={selectedContact} onClose={onClose} refetch={refetch} />
       case "delete":
         return deleteConfirmationRenderer()
       default:

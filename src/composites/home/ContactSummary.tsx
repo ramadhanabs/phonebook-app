@@ -2,6 +2,7 @@
 /** @jsx jsx */
 
 import { jsx, css } from "@emotion/react"
+import Link from "next/link"
 
 const baseSummaryStyle = css`
   background: rgb(237, 242, 247);
@@ -72,7 +73,9 @@ const ContactSummary = () => {
       <div css={baseCardStyle}>
         <div className="top-section">
           <img src="/logo-white.svg" width="80px" alt="logo-phonebook-white" />
-          <button>Add Contact</button>
+          <Link href="/contact-form">
+            <button>Add Contact</button>
+          </Link>
         </div>
         <div className="summary-wrapper">
           <div>

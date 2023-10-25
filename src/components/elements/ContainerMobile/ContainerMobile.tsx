@@ -8,8 +8,6 @@ const baseContainerStyle = css`
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
 `
 
 export default function ContainerMobile(props: PropsWithChildren<{ className?: string }>) {

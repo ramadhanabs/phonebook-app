@@ -7,12 +7,11 @@ import { useForm, useFieldArray } from "react-hook-form"
 import { PlusCircleIcon, QuestionMarkCircleIcon, TrashIcon } from "@heroicons/react/24/solid"
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useMutation } from "@apollo/client"
-import { POST_CONTACT } from "@/graphql/mutations"
+import { useMutation } from "urql"
+import { POST_CONTACT, UPDATE_CONTACT, UPDATE_CONTACT_PHONE_NUMBER } from "@/graphql/mutations"
 import PrimaryButton from "@/components/elements/Button/PrimaryButton"
 import { toast } from "react-hot-toast"
-import { GET_CONTACT_DETAIL, GET_CONTACT_LIST } from "@/graphql/queries"
-import { variables } from "@/pages"
+import { IContact, UpdateFormParamsType } from "@/types"
 
 const baseContactFormStyle = css`
   padding: 0px 16px 100px 16px;
@@ -127,7 +126,7 @@ const baseContactFormStyle = css`
 interface FormValues {
   first_name: string
   last_name: string
-  phones: {
+  phones?: {
     number: string
   }[]
 }
@@ -135,182 +134,242 @@ interface FormValues {
 interface ContactFormProps {
   isEditForm?: boolean
   onClose: () => void
+  refetch: () => void
+  data?: IContact
+}
+
+interface UpdatePhoneNumberParamsType {
+  pk_colums: {
+    number: string
+    id: number
+  }
+  new_phone_number: string
 }
 
 export interface ContactFormRef {
   resetForm: () => void
 }
 
-const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(({ isEditForm, onClose }, ref) => {
-  const [postContactMutation, { data, loading, error }] = useMutation<any, FormValues>(
-    POST_CONTACT,
-    {
-      refetchQueries: [
-        {
-          query: GET_CONTACT_LIST,
-          variables,
-        },
-      ],
-    }
-  )
-  const [isShowTooltip, setIsShowTooltip] = useState(false)
-  const {
-    control,
-    handleSubmit,
-    register,
-    reset,
-    formState: { errors, isDirty },
-  } = useForm<FormValues>({
-    defaultValues: {
-      first_name: "",
-      last_name: "",
-      phones: [
-        {
-          number: "",
-        },
-      ],
-    },
-  })
+export const variables = {
+  limit: 10,
+  offset: 0,
+  order_by: {
+    created_at: "desc",
+  },
+}
 
-  const { fields, append, remove } = useFieldArray({
-    name: "phones",
-    control,
-  })
+const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(
+  ({ isEditForm, onClose, data, refetch }, ref) => {
+    const [postContactResult, postContactMutation] = useMutation<any, FormValues>(POST_CONTACT)
+    const [updateContactResult, updateContactMutation] = useMutation<
+      any,
+      UpdateFormParamsType<FormValues>
+    >(UPDATE_CONTACT)
+    const [updatePhoneNumberResult, updatePhoneNumberMutation] = useMutation<
+      any,
+      UpdatePhoneNumberParamsType
+    >(UPDATE_CONTACT_PHONE_NUMBER)
 
-  const handleAddNumber = () => {
-    append({
-      number: "",
-    })
-  }
+    const { data: dataPost, fetching: fetchingPost, error: errorPost } = postContactResult
+    const { data: dataUpdate, fetching: fetchingUpdate, error: errorUpdate } = updateContactResult
+    const { data: dataPhoneNumber, error: errorPhoneNumber } = updatePhoneNumberResult
 
-  const handleDeleteNumber = (index: number) => {
-    remove(index)
-  }
-
-  const onSubmit = (data: FormValues) => {
-    postContactMutation({
-      variables: {
-        ...data,
+    const [isShowTooltip, setIsShowTooltip] = useState(false)
+    const {
+      control,
+      handleSubmit,
+      register,
+      reset,
+      setValue,
+      formState: { errors, isDirty },
+    } = useForm<FormValues>({
+      defaultValues: {
+        first_name: "",
+        last_name: "",
+        phones: [
+          {
+            number: "",
+          },
+        ],
       },
     })
-  }
 
-  useEffect(() => {
-    if (error) {
-      toast.error(error.message)
+    const { fields, append, remove, replace } = useFieldArray({
+      name: "phones",
+      control,
+    })
+
+    const handleAddNumber = () => {
+      append({
+        number: "",
+      })
     }
-  }, [error])
 
-  useEffect(() => {
-    if (data) {
-      toast.success("Success add contact")
-      onClose()
+    const handleDeleteNumber = (index: number) => {
+      remove(index)
     }
-  }, [data])
 
-  useImperativeHandle(ref, () => ({
-    resetForm() {
-      reset()
-    },
-  }))
+    const onSubmit = (formData: FormValues) => {
+      if (isEditForm) {
+        const formDataEdit = {
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+        }
 
-  return (
-    <div css={baseContactFormStyle}>
-      <form onSubmit={handleSubmit(onSubmit)} id="form">
-        <div className="field-wrapper">
-          <label htmlFor="contact-name">First Name</label>
-          <FormInputText
-            id="contact-name"
-            placeholder="First Name"
-            {...register("first_name", {
-              required: true,
-              pattern: {
-                value: /^[a-zA-Z0-9\s]+$/i,
-                message: "No special characters",
-              },
-            })}
-          />
-          {errors.first_name?.message && (
-            <label className="error">{errors.first_name?.message}</label>
-          )}
-        </div>
-        <div className="field-wrapper">
-          <label htmlFor="last-name">Last Name</label>
-          <FormInputText
-            id="last-name"
-            placeholder="Last Name"
-            {...register("last_name", {
-              required: true,
-              pattern: {
-                value: /^[a-zA-Z0-9\s]+$/i,
-                message: "No special characters",
-              },
-            })}
-          />
-          {errors.last_name?.message && (
-            <label className="error">{errors.last_name?.message}</label>
-          )}
-        </div>
-        <div className="field-wrapper">
-          <div className="label-wrapper">
-            <div className="label-inner-wrapper">
-              <label htmlFor="contact-number">Contact Number</label>
-              <div className="tooltip-wrapper">
-                <QuestionMarkCircleIcon
-                  className="icon-question"
-                  onClick={() => setIsShowTooltip(!isShowTooltip)}
-                />
-                <AnimatePresence>
-                  {isShowTooltip && (
-                    <motion.div
-                      className="tooltip"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <p>You can put multiple numbers</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-            <button type="button" onClick={handleAddNumber}>
-              <PlusCircleIcon className="icon" />
-            </button>
+        updateContactMutation({
+          id: data?.id,
+          _set: {
+            ...formDataEdit,
+          },
+        }).then(res => {
+          if (!res.error) {
+            refetch()
+          }
+        })
+      } else {
+        postContactMutation({
+          ...formData,
+        })
+      }
+    }
+
+    useEffect(() => {
+      if (errorPost || errorUpdate) {
+        toast.error((errorPost?.message || errorUpdate?.message) ?? "")
+      }
+    }, [errorPost, errorUpdate])
+
+    useEffect(() => {
+      if (dataPost || dataUpdate) {
+        const message = dataPost ? "Success Add Contact" : "Success Edit Contact"
+        toast.success(message)
+        onClose()
+      }
+    }, [dataPost, dataUpdate])
+
+    useEffect(() => {
+      if (isEditForm) {
+        setValue("first_name", data?.first_name ?? "")
+        setValue("last_name", data?.last_name ?? "")
+        replace(data?.phones || [])
+      }
+    }, [isEditForm])
+
+    useImperativeHandle(ref, () => ({
+      resetForm() {
+        reset()
+      },
+    }))
+
+    return (
+      <div css={baseContactFormStyle}>
+        <form onSubmit={handleSubmit(onSubmit)} id="form">
+          <div className="field-wrapper">
+            <label htmlFor="contact-name">First Name</label>
+            <FormInputText
+              id="contact-name"
+              placeholder="First Name"
+              {...register("first_name", {
+                required: true,
+                pattern: {
+                  value: /^[a-zA-Z0-9\s]+$/i,
+                  message: "No special characters",
+                },
+              })}
+            />
+            {errors.first_name?.message && (
+              <label className="error">{errors.first_name?.message}</label>
+            )}
           </div>
-          {fields.map((field, index) => (
-            <motion.div
-              key={field.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: "spring", duration: "0.1s" }}
-              className="phone-field-wrapper"
-            >
-              <FormInputText
-                placeholder="Contact Phone Number"
-                type="number"
-                {...register(`phones.${index}.number`, { required: true })}
-              />
-              <button
-                onClick={() => handleDeleteNumber(index)}
-                className="button-delete"
-                disabled={fields.length === 1}
-              >
-                <TrashIcon className="icon" />
-              </button>
-            </motion.div>
-          ))}
-        </div>
-      </form>
+          <div className="field-wrapper">
+            <label htmlFor="last-name">Last Name</label>
+            <FormInputText
+              id="last-name"
+              placeholder="Last Name"
+              {...register("last_name", {
+                required: true,
+                pattern: {
+                  value: /^[a-zA-Z0-9\s]+$/i,
+                  message: "No special characters",
+                },
+              })}
+            />
+            {errors.last_name?.message && (
+              <label className="error">{errors.last_name?.message}</label>
+            )}
+          </div>
+          <div className="field-wrapper">
+            <div className="label-wrapper">
+              <div className="label-inner-wrapper">
+                <label htmlFor="contact-number">Contact Number</label>
+                <div className="tooltip-wrapper">
+                  <QuestionMarkCircleIcon
+                    className="icon-question"
+                    onClick={() => setIsShowTooltip(!isShowTooltip)}
+                  />
+                  <AnimatePresence>
+                    {isShowTooltip && (
+                      <motion.div
+                        className="tooltip"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <p>You can put multiple numbers</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
 
-      <div className="button-wrapper">
-        <PrimaryButton isLoading={loading} type="submit" form="form" disabled={!isDirty}>
-          {isEditForm ? "Edit" : "Save"}
-        </PrimaryButton>
+              {!isEditForm && (
+                <button type="button" onClick={handleAddNumber}>
+                  <PlusCircleIcon className="icon" />
+                </button>
+              )}
+            </div>
+            {fields.map((field, index) => (
+              <motion.div
+                key={field.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ type: "spring", duration: "0.1s" }}
+                className="phone-field-wrapper"
+              >
+                <FormInputText
+                  placeholder="Contact Phone Number"
+                  type="number"
+                  disabled={isEditForm}
+                  {...register(`phones.${index}.number`, { required: true })}
+                />
+                {!isEditForm && (
+                  <button
+                    onClick={() => handleDeleteNumber(index)}
+                    className="button-delete"
+                    disabled={fields.length === 1}
+                  >
+                    <TrashIcon className="icon" />
+                  </button>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </form>
+
+        <div className="button-wrapper">
+          <PrimaryButton
+            isLoading={fetchingPost || fetchingUpdate}
+            type="submit"
+            form="form"
+            disabled={!isDirty}
+          >
+            {isEditForm ? "Edit" : "Save"}
+          </PrimaryButton>
+        </div>
       </div>
-    </div>
-  )
-})
+    )
+  }
+)
 
 export default ContactForm

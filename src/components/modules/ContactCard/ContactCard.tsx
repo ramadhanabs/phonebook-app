@@ -1,18 +1,17 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 
-import React from "react"
+import React, { useMemo } from "react"
 import { ContactListType } from "@/components/modules/ContactList/ContactList"
 import { jsx, css } from "@emotion/react"
-import { HeartIcon } from "@heroicons/react/24/outline"
-import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid"
-import { IContact } from "@/types"
+import { IContact, Phone } from "@/types"
 import ContentLoader from "@/components/elements/ContentLoader"
+import { IContactDB } from "@/db/config"
+import fakeImage from "@/helpers/fakeImage"
 
 const contactCardStyle = css`
   background: white;
-  outline: 1px solid #d6dfeb;
-  outline-offset: -1px;
+  border: 1px solid #d6dfeb;
   border-radius: 8px;
 
   display: flex;
@@ -119,48 +118,34 @@ export const ContactCardLoader = () => (
 )
 
 const ContactCard = (props: ContactCardProps) => {
-  if (!props.data) return <></>
+  const phoneList: Phone[] = useMemo(() => {
+    const contact = props.data as unknown as IContactDB
+    if (contact.contact_id && contact.phones) {
+      return JSON.parse(contact.phones)
+    }
 
+    return props.data?.phones
+  }, [props.data])
+  if (!props.data) return <></>
   return (
     <div css={contactCardStyle}>
       <div className="container" onClick={props.onOpenModal}>
         <div className="accent"></div>
-        <img
-          src="https://api.dicebear.com/7.x/thumbs/svg?seed=Bubba"
-          width="32px"
-          height="32px"
-          alt="logo-phonebook-white"
-        />
+        <img src={fakeImage("thumbs")} width="32px" height="32px" alt="logo-phonebook-white" />
         <div>
           <p className="title">
             {props.data.first_name} {props.data.last_name}
           </p>
-          {props.data.phones.length > 0 && (
+          {phoneList.length > 0 && (
             <div className="content-wrapper">
-              <p className="content">{props.data.phones[0]?.number}</p>
-              {props.data.phones.length > 1 && (
-                <div className="content-detail">+{props.data.phones.length - 1} More</div>
+              <p className="content">{phoneList[0]?.number}</p>
+              {phoneList.length > 1 && (
+                <div className="content-detail">+{phoneList.length - 1} More</div>
               )}
             </div>
           )}
         </div>
       </div>
-
-      {props.type !== undefined ? (
-        <button className="button-wrapper">
-          {props.type === "home" ? (
-            <>
-              <HeartIcon className="icon" />
-              <p style={{ fontSize: "10px" }}>Favorite</p>
-            </>
-          ) : (
-            <>
-              <HeartSolidIcon className="icon" />
-              <p style={{ fontSize: "10px" }}>Remove</p>
-            </>
-          )}
-        </button>
-      ) : null}
     </div>
   )
 }

@@ -4,7 +4,7 @@ import classNames from "classnames"
 
 const baseContainerStyle = css`
   width: 100%;
-  max-width: 1440px;
+  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
 `
