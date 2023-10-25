@@ -134,7 +134,7 @@ interface FormValues {
 interface ContactFormProps {
   isEditForm?: boolean
   onClose: () => void
-  refetch: () => void
+  refetch?: () => void
   data?: IContact
 }
 
@@ -159,7 +159,7 @@ export const variables = {
 }
 
 const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(
-  ({ isEditForm, onClose, data, refetch }, ref) => {
+  ({ isEditForm, onClose, data, refetch = () => {} }, ref) => {
     const [postContactResult, postContactMutation] = useMutation<any, FormValues>(POST_CONTACT)
     const [updateContactResult, updateContactMutation] = useMutation<
       any,
