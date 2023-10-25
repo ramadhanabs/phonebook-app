@@ -26,7 +26,7 @@ const FavoritePage = () => {
 
       <div css={recentFavoriteStyle}>
         <h1>Recent Favorite</h1>
-        <ContactList count={5} type="favorite" />
+        <ContactList type="favorite" />
       </div>
     </>
   )

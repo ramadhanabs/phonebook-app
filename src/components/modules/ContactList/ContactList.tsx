@@ -36,7 +36,7 @@ interface ContactListProps {
   isWithPagination?: boolean
   type?: ContactListType
   data?: IContact[]
-  isLoading: boolean
+  isLoading?: boolean
 }
 
 const ContactListLoader = () => {

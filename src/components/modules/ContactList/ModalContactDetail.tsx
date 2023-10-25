@@ -200,7 +200,7 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
   const contentRenderer = () => {
     switch (detailMode) {
       case "edit":
-        return <ContactForm isEditForm />
+        return <ContactForm isEditForm onClose={onClose} />
       case "delete":
         return deleteConfirmationRenderer()
       default:
