@@ -3,7 +3,13 @@
 
 import { jsx, css } from "@emotion/react"
 import Image from "next/image"
+import React, { useState, KeyboardEvent } from "react"
 import FormInputText from "../Forms/FormInputText"
+import { motion, AnimatePresence } from "framer-motion"
+import { useQuery } from "urql"
+import { ContactResponse } from "@/types"
+import { GET_CONTACT_LIST } from "@/graphql/queries"
+import ContactCard from "@/components/modules/ContactCard/ContactCard"
 
 const baseNavStyle = css`
   position: fixed;
@@ -17,17 +23,159 @@ const baseNavStyle = css`
   border-bottom: 1px solid #d6dfeb;
 
   background: white;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
+
+  .wrapper {
+    position: relative;
+  }
+
+  .navbar-content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    z-index: 9999;
+  }
+
+  .search-menu-container {
+    position: absolute;
+    top: 46px;
+    z-index: 10;
+
+    background: white;
+    border-top: 1px solid #d6dfeb;
+    border-bottom: 1px solid #d6dfeb;
+    height: 70vh;
+    width: 100%;
+    padding: 8px;
+
+    overflow-y: scroll;
+  }
+
+  .overlay {
+    background: black;
+    height: 100vh;
+    width: 100%;
+    z-index: 9999;
+    display: fixed;
+  }
+
+  .search-result-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+
+    p.title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    p.subtitle {
+      font-size: 12px;
+      opacity: 50%;
+    }
+  }
 `
 
 const Header = () => {
+  const [isShowSearch, setIsShowSearch] = useState(false)
+  const [keyword, setKeyword] = useState("")
+  const [result, fetch] = useQuery<ContactResponse>({
+    query: GET_CONTACT_LIST,
+    pause: true,
+    variables: {
+      limit: 10,
+      offset: 0,
+      order_by: {
+        created_at: "desc",
+      },
+      where: {
+        first_name: { _like: `%${keyword}%` },
+      },
+    },
+  })
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      fetch()
+    }
+  }
+
+  const contentResultRenderer = () => {
+    if (!result.data) {
+      return (
+        <div className="empty-state">
+          <div>
+            <p className="title">Search contact here 🔍</p>
+            <p className="subtitle">Input by first name of contact</p>
+          </div>
+        </div>
+      )
+    }
+
+    if (result.data.contact.length === 0) {
+      return (
+        <div className="empty-state">
+          <div>
+            <p className="title">Oops! We cant find your data 🥺</p>
+            <p className="subtitle">Please try another keyword</p>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="search-result-wrapper">
+        {result?.data?.contact.map(item => (
+          <ContactCard key={item.id} data={item} />
+        ))}
+      </div>
+    )
+  }
+
   return (
     <header css={[baseNavStyle]}>
-      <Image src="/logo.svg" width={120} height={30} alt="logo-phonebook" />
-      <FormInputText placeholder="Search for Contact" />
+      <div className="wrapper">
+        <div className="navbar-content-wrapper">
+          <Image src="/logo.svg" width={120} height={30} alt="logo-phonebook" />
+          <FormInputText
+            placeholder={isShowSearch ? "Type 'Enter' to search " : "Search by First Name"}
+            onFocus={() => setIsShowSearch(true)}
+            onBlur={() => setIsShowSearch(false)}
+            onKeyDown={handleKeyDown}
+            onChange={e => setKeyword(e.target.value)}
+          />
+        </div>
+
+        <AnimatePresence>
+          {isShowSearch && (
+            <>
+              <motion.div
+                initial={{ translateY: "-50px", opacity: 0 }}
+                animate={{ translateY: 0, opacity: 1 }}
+                exit={{ translateY: "-20px", opacity: 0 }}
+                className="search-menu-container"
+              >
+                {contentResultRenderer()}
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                className="overlay"
+              ></motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
     </header>
   )
 }
