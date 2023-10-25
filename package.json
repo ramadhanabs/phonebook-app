@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.11.0",
     "@heroicons/react": "^2.0.18",
     "classnames": "^2.3.2",
+    "dexie": "^3.2.4",
     "framer-motion": "^10.16.4",
     "graphql": "^16.8.1",
     "next": "13.5.6",
@@ -24,7 +25,8 @@
     "react-modal-sheet": "^2.2.0",
     "react-slick": "^0.29.0",
     "slick-carousel": "^1.8.1",
-    "ua-parser-js": "^1.0.36"
+    "ua-parser-js": "^1.0.36",
+    "urql": "^4.0.5"
   },
   "devDependencies": {
     "@types/node": "^20",
