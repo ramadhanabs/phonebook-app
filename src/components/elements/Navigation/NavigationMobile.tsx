@@ -57,7 +57,7 @@ const LIST_MENU = [
   {
     id: "Favorite",
     label: "Favorite",
-    href: "/contact-favorite",
+    href: "/favorite",
     icon: <BookmarkIcon css={[iconBaseStyle]} />,
   },
 ]
