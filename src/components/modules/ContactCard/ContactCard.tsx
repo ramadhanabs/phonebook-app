@@ -6,6 +6,8 @@ import { ContactListType } from "@/components/modules/ContactList/ContactList"
 import { jsx, css } from "@emotion/react"
 import { HeartIcon } from "@heroicons/react/24/outline"
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid"
+import { IContact } from "@/types"
+import ContentLoader from "@/components/elements/ContentLoader"
 
 const contactCardStyle = css`
   background: white;
@@ -88,14 +90,37 @@ const contactCardStyle = css`
     width: 20px;
     height: 20px;
   }
+
+  .loader-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
 `
 
 interface ContactCardProps {
   type?: ContactListType
   onOpenModal?: () => void
+  data?: IContact
 }
 
+export const ContactCardLoader = () => (
+  <div css={contactCardStyle}>
+    <div className="container">
+      <div className="accent"></div>
+      <ContentLoader width="32px" height="32px" />
+
+      <div className="loader-content-wrapper">
+        <ContentLoader width="200px" height="8px" />
+        <ContentLoader width="160px" height="8px" />
+      </div>
+    </div>
+  </div>
+)
+
 const ContactCard = (props: ContactCardProps) => {
+  if (!props.data) return <></>
+
   return (
     <div css={contactCardStyle}>
       <div className="container" onClick={props.onOpenModal}>
@@ -107,11 +132,17 @@ const ContactCard = (props: ContactCardProps) => {
           alt="logo-phonebook-white"
         />
         <div>
-          <p className="title">Firstname Lastname</p>
-          <div className="content-wrapper">
-            <p className="content">081023123</p>
-            <div className="content-detail">+2 More</div>
-          </div>
+          <p className="title">
+            {props.data.first_name} {props.data.last_name}
+          </p>
+          {props.data.phones.length > 0 && (
+            <div className="content-wrapper">
+              <p className="content">{props.data.phones[0]?.number}</p>
+              {props.data.phones.length > 1 && (
+                <div className="content-detail">+{props.data.phones.length - 1} More</div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

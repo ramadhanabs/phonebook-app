@@ -9,6 +9,7 @@ import { ContactListType } from "./ContactList"
 import { ChevronRightIcon } from "@heroicons/react/24/outline"
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid"
 import ContactForm from "../ContactForm/ContactForm"
+import { IContact } from "@/types"
 
 const baseBottomSheetStyle = css`
   .wrapper-contact-detail {
@@ -138,10 +139,11 @@ interface ModalContactDetailProps {
   isOpen: boolean
   onClose: () => void
   type?: ContactListType
+  selectedContact?: IContact
 }
 
 const ModalContactDetail = (props: ModalContactDetailProps) => {
-  const { isOpen, onClose, type } = props
+  const { isOpen, onClose, selectedContact } = props
   const [detailMode, setDetailMode] = useState<string>("")
 
   useEffect(() => {
@@ -211,7 +213,7 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
       <div css={baseBottomSheetStyle}>
         <div className="wrapper-contact-detail">
           <div className="wrapper-contact-card">
-            <ContactCard type={type} />
+            <ContactCard data={selectedContact} />
           </div>
 
           <hr />

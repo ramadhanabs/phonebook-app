@@ -8,6 +8,10 @@ import ContactList from "@/components/modules/ContactList/ContactList"
 import isMobile from "@/helpers/isMobile"
 import { GetServerSideProps } from "next"
 import React from "react"
+import { useQuery } from "@apollo/client"
+import { ContactResponse } from "@/types"
+import { GET_CONTACT_LIST } from "@/graphql/queries"
+import { variables } from "."
 
 const recentContactWrapperStyle = css`
   padding-top: 20px;
@@ -21,6 +25,9 @@ const recentContactWrapperStyle = css`
 `
 
 const ContactFormPage = () => {
+  const { loading, error, data } = useQuery<ContactResponse>(GET_CONTACT_LIST, { variables })
+  const contactData = data?.contact
+
   return (
     <>
       <MetaData title="Contact Form" />
@@ -29,7 +36,7 @@ const ContactFormPage = () => {
 
         <div css={recentContactWrapperStyle}>
           <h1>Recent Contact</h1>
-          <ContactList count={5} />
+          <ContactList isLoading={loading} data={contactData} />
         </div>
       </main>
     </>

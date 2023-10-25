@@ -1,11 +1,11 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 
-import BottomSheetModal from "@/components/elements/BottomSheetModal/BottomSheetModal"
-import ContactCard from "@/components/modules/ContactCard/ContactCard"
+import ContactCard, { ContactCardLoader } from "@/components/modules/ContactCard/ContactCard"
 import useDisclosure from "@/hooks/useDisclosure"
+import { IContact } from "@/types"
 import { jsx, css } from "@emotion/react"
-import React from "react"
+import React, { useState } from "react"
 import ModalContactDetail from "./ModalContactDetail"
 
 const baseContactListStyle = css`
@@ -30,28 +30,60 @@ const baseContactListStyle = css`
   }
 `
 
-export type ContactListType = "home" | "contact-form"
+export type ContactListType = "home" | "favorite"
 
 interface ContactListProps {
-  count?: number
   isWithPagination?: boolean
   type?: ContactListType
+  data?: IContact[]
+  isLoading: boolean
+}
+
+const ContactListLoader = () => {
+  return (
+    <div css={baseContactListStyle}>
+      {Array.from(Array(5).keys()).map((_, idx) => (
+        <ContactCardLoader key={idx} />
+      ))}
+    </div>
+  )
 }
 
 const ContactList = (props: ContactListProps) => {
-  const { count, isWithPagination, type } = props
+  const { data, isWithPagination, type, isLoading } = props
   const { isOpen: isOpenDetail, onOpen: onOpenDetail, onClose: onCloseDetail } = useDisclosure()
+
+  const [selectedContact, setSelectedContact] = useState<IContact | undefined>(undefined)
+
+  const handleOpenModal = (contact: IContact) => {
+    setSelectedContact(contact)
+    onOpenDetail()
+  }
+
+  const handleCloseModal = () => {}
+
+  if (isLoading) return <ContactListLoader />
+
   return (
     <>
       <div css={baseContactListStyle}>
-        {Array.from(Array(count).keys()).map((_, idx) => (
-          <ContactCard key={idx} type={type} onOpenModal={onOpenDetail} />
+        {data?.map((item, idx) => (
+          <ContactCard
+            data={item}
+            key={idx}
+            type={type}
+            onOpenModal={() => handleOpenModal(item)}
+          />
         ))}
-
         {isWithPagination && <button className="load-more">Load More</button>}
       </div>
 
-      <ModalContactDetail isOpen={isOpenDetail} onClose={onCloseDetail} type={type} />
+      <ModalContactDetail
+        selectedContact={selectedContact}
+        isOpen={isOpenDetail}
+        onClose={onCloseDetail}
+        type={type}
+      />
     </>
   )
 }

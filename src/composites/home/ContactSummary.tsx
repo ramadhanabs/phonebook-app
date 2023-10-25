@@ -59,7 +59,7 @@ const baseCardStyle = css`
     background: white;
     font-size: 12px;
     width: 70px;
-    padding: 4px;
+    padding: 6px;
     border-radius: 9999px;
     font-weight: 600;
     text-align: center;
@@ -72,7 +72,7 @@ const ContactSummary = () => {
       <div css={baseCardStyle}>
         <div className="top-section">
           <img src="/logo-white.svg" width="80px" alt="logo-phonebook-white" />
-          <button>See All</button>
+          <button>Add Contact</button>
         </div>
         <div className="summary-wrapper">
           <div>

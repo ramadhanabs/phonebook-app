@@ -5,8 +5,14 @@ import FormInputText from "@/components/elements/Forms/FormInputText"
 import { jsx, css } from "@emotion/react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { PlusCircleIcon, QuestionMarkCircleIcon, TrashIcon } from "@heroicons/react/24/solid"
-import React, { useState } from "react"
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useMutation } from "@apollo/client"
+import { POST_CONTACT } from "@/graphql/mutations"
+import PrimaryButton from "@/components/elements/Button/PrimaryButton"
+import { toast } from "react-hot-toast"
+import { GET_CONTACT_DETAIL, GET_CONTACT_LIST } from "@/graphql/queries"
+import { variables } from "@/pages"
 
 const baseContactFormStyle = css`
   padding: 0px 16px 100px 16px;
@@ -39,24 +45,6 @@ const baseContactFormStyle = css`
     left: 0px;
 
     border-top: 1px solid #d6dfeb;
-  }
-
-  button {
-    background: #04a95b;
-    padding: 8px;
-    color: white;
-    outline: none;
-    font-size: 14px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-
-    box-sizing: border-box;
-
-    &:disabled {
-      opacity: 50%;
-    }
   }
 
   .label-wrapper {
@@ -137,7 +125,8 @@ const baseContactFormStyle = css`
 `
 
 interface FormValues {
-  name: string
+  first_name: string
+  last_name: string
   phones: {
     number: string
   }[]
@@ -145,18 +134,36 @@ interface FormValues {
 
 interface ContactFormProps {
   isEditForm?: boolean
+  onClose: () => void
 }
 
-const ContactForm = ({ isEditForm }: ContactFormProps) => {
+export interface ContactFormRef {
+  resetForm: () => void
+}
+
+const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(({ isEditForm, onClose }, ref) => {
+  const [postContactMutation, { data, loading, error }] = useMutation<any, FormValues>(
+    POST_CONTACT,
+    {
+      refetchQueries: [
+        {
+          query: GET_CONTACT_LIST,
+          variables,
+        },
+      ],
+    }
+  )
   const [isShowTooltip, setIsShowTooltip] = useState(false)
   const {
     control,
     handleSubmit,
     register,
-    formState: { errors, dirtyFields },
+    reset,
+    formState: { errors, isDirty },
   } = useForm<FormValues>({
     defaultValues: {
-      name: "",
+      first_name: "",
+      last_name: "",
       phones: [
         {
           number: "",
@@ -181,26 +188,68 @@ const ContactForm = ({ isEditForm }: ContactFormProps) => {
   }
 
   const onSubmit = (data: FormValues) => {
-    console.log(data) // Handle form submission here
+    postContactMutation({
+      variables: {
+        ...data,
+      },
+    })
   }
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message)
+    }
+  }, [error])
+
+  useEffect(() => {
+    if (data) {
+      toast.success("Success add contact")
+      onClose()
+    }
+  }, [data])
+
+  useImperativeHandle(ref, () => ({
+    resetForm() {
+      reset()
+    },
+  }))
 
   return (
     <div css={baseContactFormStyle}>
       <form onSubmit={handleSubmit(onSubmit)} id="form">
         <div className="field-wrapper">
-          <label htmlFor="contact-name">Contact Name</label>
+          <label htmlFor="contact-name">First Name</label>
           <FormInputText
             id="contact-name"
-            placeholder="Contact Name"
-            {...register("name", {
+            placeholder="First Name"
+            {...register("first_name", {
               required: true,
               pattern: {
-                value: /^[a-z0-9]+$/i,
+                value: /^[a-zA-Z0-9\s]+$/i,
                 message: "No special characters",
               },
             })}
           />
-          {errors.name?.message && <label className="error">{errors.name?.message}</label>}
+          {errors.first_name?.message && (
+            <label className="error">{errors.first_name?.message}</label>
+          )}
+        </div>
+        <div className="field-wrapper">
+          <label htmlFor="last-name">Last Name</label>
+          <FormInputText
+            id="last-name"
+            placeholder="Last Name"
+            {...register("last_name", {
+              required: true,
+              pattern: {
+                value: /^[a-zA-Z0-9\s]+$/i,
+                message: "No special characters",
+              },
+            })}
+          />
+          {errors.last_name?.message && (
+            <label className="error">{errors.last_name?.message}</label>
+          )}
         </div>
         <div className="field-wrapper">
           <div className="label-wrapper">
@@ -256,12 +305,12 @@ const ContactForm = ({ isEditForm }: ContactFormProps) => {
       </form>
 
       <div className="button-wrapper">
-        <button type="submit" form="form" disabled={!dirtyFields.name}>
+        <PrimaryButton isLoading={loading} type="submit" form="form" disabled={!isDirty}>
           {isEditForm ? "Edit" : "Save"}
-        </button>
+        </PrimaryButton>
       </div>
     </div>
   )
-}
+})
 
 export default ContactForm
