@@ -36,7 +36,7 @@ const BottomSheetModal = (props: PropsWithChildren<BottomSheetModalProps>) => {
         isOpen={isOpen}
         onClose={onClose}
         tweenConfig={{ ease: "easeIn", duration: 0.1 }}
-        snapPoints={[600, 0]}
+        snapPoints={[640, 0]}
         detent="content-height"
       >
         <Sheet.Container>
