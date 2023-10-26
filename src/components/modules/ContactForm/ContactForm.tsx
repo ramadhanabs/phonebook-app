@@ -20,7 +20,7 @@ const baseContactFormStyle = css`
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-height: 300px;
+    min-height: 460px;
     overflow-y: scroll;
   }
 
