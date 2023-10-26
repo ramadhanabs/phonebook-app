@@ -11,6 +11,8 @@ const formBaseStyle = css`
   padding: 8px 12px;
   height: max-content;
   color: #4a4d52;
+  font-size: 16px;
+  font-weight: 300;
 
   &:focus {
     outline: #04a95b;
@@ -19,6 +21,8 @@ const formBaseStyle = css`
 
   &::placeholder {
     color: #939bad;
+    font-size: 16px;
+    font-weight: 300;
   }
 `
 

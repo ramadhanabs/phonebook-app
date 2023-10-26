@@ -32,6 +32,10 @@ const baseContactFormStyle = css`
     display: flex;
     flex-direction: column;
     gap: 6px;
+
+    label {
+      font-size: 14px;
+    }
   }
 
   .button-wrapper {
