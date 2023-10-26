@@ -271,7 +271,11 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
 
   const deleteConfirmationRenderer = () => {
     return (
-      <div className="delete-action-wrapper">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="delete-action-wrapper"
+      >
         <p className="title">Are you sure to delete this contact?</p>
 
         <div className="button-confirmation-wrapper">
@@ -280,7 +284,7 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
           </PrimaryButton>
           <button onClick={() => setDetailMode("")}>No</button>
         </div>
-      </div>
+      </motion.div>
     )
   }
 

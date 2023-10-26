@@ -38,7 +38,7 @@ const baseNavStyle = css`
 
   .search-menu-container {
     position: absolute;
-    top: 46px;
+    top: 52px;
     z-index: 10;
 
     background: white;
@@ -49,6 +49,7 @@ const baseNavStyle = css`
     padding: 8px;
 
     overflow-y: scroll;
+    transform-origin: top center;
   }
 
   .overlay {
@@ -159,9 +160,9 @@ const Header = () => {
           {isShowSearch && (
             <>
               <motion.div
-                initial={{ translateY: "-50px", opacity: 0 }}
-                animate={{ translateY: 0, opacity: 1 }}
-                exit={{ translateY: "-20px", opacity: 0 }}
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.6 }}
                 className="search-menu-container"
               >
                 {contentResultRenderer()}

@@ -3,6 +3,7 @@
 
 import { jsx, css } from "@emotion/react"
 import Link from "next/link"
+import Image from "next/image"
 
 const baseSummaryStyle = css`
   background: rgb(237, 242, 247);
@@ -15,6 +16,7 @@ const baseSummaryStyle = css`
 
 const baseCardStyle = css`
   background: url("/bg-summary.webp");
+  background-color: #2a372f;
   background-size: 100%;
   object-fit: cover;
   background-repeat: no-repeat;
@@ -72,7 +74,7 @@ const ContactSummary = () => {
     <div css={baseSummaryStyle}>
       <div css={baseCardStyle}>
         <div className="top-section">
-          <img src="/logo-white.svg" width="80px" alt="logo-phonebook-white" />
+          <Image src="/logo-white.svg" width={80} height={30} alt="logo-phonebook-white" />
           <Link href="/contact-form">
             <button>Add Contact</button>
           </Link>
