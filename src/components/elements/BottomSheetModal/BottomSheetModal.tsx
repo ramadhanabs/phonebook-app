@@ -26,6 +26,7 @@ interface BottomSheetModalProps {
   onClose: () => void
   closeOnOverlayClick?: false
   title: string
+  "data-testid"?: string
 }
 
 const BottomSheetModal = (props: PropsWithChildren<BottomSheetModalProps>) => {
@@ -38,6 +39,7 @@ const BottomSheetModal = (props: PropsWithChildren<BottomSheetModalProps>) => {
         tweenConfig={{ ease: "easeIn", duration: 0.1 }}
         snapPoints={[640, 0]}
         detent="content-height"
+        data-testid={props["data-testid"]}
       >
         <Sheet.Container>
           <Sheet.Header css={baseHeaderStyle}>{title}</Sheet.Header>
