@@ -46,7 +46,7 @@ const anchorActiveStyle = css`
   border-top: 1px solid #04a95b;
 `
 
-const LIST_MENU = [
+export const LIST_MENU = [
   {
     id: "contact",
     label: "Contact",

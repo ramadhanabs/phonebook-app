@@ -69,7 +69,36 @@ const baseCardStyle = css`
   }
 `
 
-const ContactSummary = () => {
+const ContactSummary = ({ isMobile }: { isMobile?: boolean }) => {
+  if (!isMobile)
+    return (
+      <div css={baseCardStyle}>
+        <div className="top-section">
+          <Image src="/logo-white.svg" width={80} height={30} alt="logo-phonebook-white" />
+          <Link href="/contact-form">
+            <button>Add Contact</button>
+          </Link>
+        </div>
+        <div className="summary-wrapper">
+          <div>
+            <p className="content">190</p>
+            <p className="title">Total Contact</p>
+          </div>
+          <div>
+            <p className="content">20</p>
+            <p className="title">Favorite</p>
+          </div>
+          <div>
+            <p className="content">20</p>
+            <p className="title">New</p>
+          </div>
+          <div>
+            <p className="content">9</p>
+            <p className="title">Deleted</p>
+          </div>
+        </div>
+      </div>
+    )
   return (
     <div css={baseSummaryStyle}>
       <div css={baseCardStyle}>

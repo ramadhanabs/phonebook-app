@@ -1,10 +1,13 @@
+/** @jsxRuntime classic */
+/** @jsx jsx */
+
+import { jsx, css } from "@emotion/react"
 import { PropsWithChildren } from "react"
-import { css } from "@emotion/react"
 import classNames from "classnames"
 
 const baseContainerStyle = css`
   width: 100%;
-  max-width: 600px;
+  max-width: 1440px;
   margin-left: auto;
   margin-right: auto;
 `
@@ -24,7 +27,7 @@ export default function ContainerDesktop(
       onClick={onClick}
       onMouseOver={onMouseOver}
       onMouseLeave={onMouseLeave}
-      className={classNames({ baseContainerStyle, className })}
+      css={baseContainerStyle}
     >
       {children}
     </div>

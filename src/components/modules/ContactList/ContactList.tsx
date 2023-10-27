@@ -109,8 +109,7 @@ const ContactList = (props: ContactListProps) => {
     if (!type) return contactData
     if (type === "favorite") return dataFavorite
 
-    // return mergedData.filter(item => !listIdFavorite.includes(item.id))
-    return contactData
+    return mergedData.filter(item => !listIdFavorite.includes(item.id))
   }, [mergedData, contactData, type, dataFavorite, listIdFavorite])
 
   const handleOpenModal = (contact: IContact) => {
@@ -124,6 +123,7 @@ const ContactList = (props: ContactListProps) => {
   }
 
   const refetch = () => {
+    console.log("refetch")
     setMergedData([])
     reexecuteQuery({ requestPolicy: "network-only" })
     refetchFavorite()
@@ -131,7 +131,7 @@ const ContactList = (props: ContactListProps) => {
 
   useEffect(() => {
     if (contactData) {
-      setMergedData([...mergedData, ...contactData])
+      setMergedData(prevData => [...prevData, ...contactData])
     }
   }, [contactData])
 
@@ -164,7 +164,7 @@ const ContactList = (props: ContactListProps) => {
           />
         ))}
 
-        {isWithPagination && (
+        {isWithPagination && contactData.length === 10 && (
           <PrimaryButton type="button" isLoading={fetching} onClick={handleLoadMore}>
             Load More
           </PrimaryButton>

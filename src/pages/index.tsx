@@ -5,16 +5,22 @@ import HeroSlider from "@/composites/home/HeroSlider"
 import ContactSummary from "@/composites/home/ContactSummary"
 import ContactList from "@/components/modules/ContactList/ContactList"
 import MetaData from "@/components/MetaData"
+import HomeMobile from "@/composites/home/HomeMobile"
+import HomeDesktop from "@/composites/home/HomeDesktop"
 
-export default function Home() {
+export default function Home(props: { isMobile: boolean }) {
+  const { isMobile } = props
+
+  const contentRenderer = () => {
+    if (isMobile) return <HomeMobile />
+
+    return <HomeDesktop />
+  }
+
   return (
     <>
       <MetaData title="Home" />
-      <main>
-        <ContactSummary />
-        <HeroSlider />
-        <ContactList isWithPagination type="home" />
-      </main>
+      {contentRenderer()}
     </>
   )
 }

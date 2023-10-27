@@ -100,49 +100,57 @@ const sliderWrapperStyle = css`
   flex-shrink: unset;
 `
 
-const HeroSlider = () => {
+const Loader = () => {
+  return (
+    <div css={heroStyle}>
+      <div className="no-scrollbar" css={sliderWrapperStyle}>
+        {Array.from(Array(5).keys()).map((_, idx) => (
+          <div css={favoriteCardStyle} key={idx} data-testid="loader">
+            <ContentLoader width="100%" height="120px" />
+            <div className="content">
+              <ContentLoader height="8px" width="60px" />
+              <ContentLoader height="8px" width="40px" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const HeroSlider = ({ isMobile }: { isMobile?: boolean }) => {
   const { data, isLoading } = useDBContacts({ enabled: true })
 
   const cardRenderer = () => {
-    if (isLoading) {
-      return (
-        <>
-          {Array.from(Array(5).keys()).map((_, idx) => (
-            <div css={favoriteCardStyle} key={idx} data-testid="loader">
-              <ContentLoader width="100%" height="120px" />
-              <div className="content">
-                <ContentLoader height="8px" width="60px" />
-                <ContentLoader height="8px" width="40px" />
-              </div>
+    return (
+      <>
+        {data.map((item, idx) => (
+          <div css={favoriteCardStyle} key={idx}>
+            <div style={{ padding: "20px", paddingBottom: 0 }}>
+              <img src={fakeImage("notionists")} />
             </div>
-          ))}
-        </>
-      )
-    } else {
-      return (
-        <>
-          {data.map((item, idx) => (
-            <div css={favoriteCardStyle} key={idx}>
-              <div style={{ padding: "20px", paddingBottom: 0 }}>
-                <img src={fakeImage("notionists")} />
-              </div>
-              <div className="content">
-                <p className="title">
-                  {item.first_name} {item.last_name}
-                </p>
-                <p className="subtitle">+6282227804252</p>
-              </div>
+            <div className="content">
+              <p className="title">
+                {item.first_name} {item.last_name}
+              </p>
+              <p className="subtitle">+6282227804252</p>
             </div>
-          ))}
-        </>
-      )
-    }
+          </div>
+        ))}
+      </>
+    )
   }
+
+  if (isLoading) return <Loader />
 
   if (data.length === 0) return <></>
 
   return (
-    <div css={heroStyle} data-testid="favorite-contact-container">
+    <div
+      css={heroStyle}
+      data-testid="favorite-contact-container"
+      style={{ borderRadius: !isMobile ? "8px" : "" }}
+    >
       <div className="no-scrollbar" css={sliderWrapperStyle}>
         <img src="/your-favorite-contact.png" width="120px" />
         {cardRenderer()}

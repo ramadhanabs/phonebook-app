@@ -131,7 +131,12 @@ const ContactCard = (props: ContactCardProps) => {
   if (!props.data) return <></>
   return (
     <div css={contactCardStyle}>
-      <div className="container" onClick={props.onOpenModal} data-testid={props["data-testid"]}>
+      <div
+        className="container"
+        onClick={props.onOpenModal}
+        data-testid={props["data-testid"]}
+        style={{ cursor: props.onOpenModal ? "pointer" : "default" }}
+      >
         <div className="accent"></div>
         <img src={fakeImage("thumbs")} width="32px" height="32px" alt="logo-phonebook-white" />
         <div>

@@ -107,6 +107,7 @@ a {
 
 button {
   all: unset;
+  cursor: pointer;
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -117,6 +118,6 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }

@@ -13,7 +13,7 @@ const baseOverlayStyle = css`
   background: black;
   opacity: 50%;
   height: 100vh;
-  width: 100%;
+  width: 100vw;
 `
 const baseHeaderStyle = css`
   padding: 16px;
@@ -47,9 +47,8 @@ const BottomSheetModal = (props: PropsWithChildren<BottomSheetModalProps>) => {
             <Sheet.Scroller draggableAt="both">{children}</Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>
+        <Sheet.Backdrop onTap={onClose} />
       </Sheet>
-
-      {isOpen && <div css={baseOverlayStyle} onClick={onClose}></div>}
     </>
   )
 }
