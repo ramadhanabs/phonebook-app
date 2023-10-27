@@ -70,7 +70,7 @@ const LIMIT = 10
 
 const ContactListLoader = () => {
   return (
-    <div css={baseContactListStyle}>
+    <div css={baseContactListStyle} data-testid="contact-list-loader">
       {Array.from(Array(5).keys()).map((_, idx) => (
         <ContactCardLoader key={idx} />
       ))}
@@ -94,7 +94,9 @@ const ContactList = (props: ContactListProps) => {
     },
   })
   const { data, fetching } = result
-  const contactData = data?.contact ?? []
+  const contactData = useMemo(() => {
+    return data?.contact ?? []
+  }, [data])
 
   const { data: dataFavorite, refetch: refetchFavorite } = useDBContacts({ enabled: true })
   const listIdFavorite = useMemo(() => dataFavorite.map(item => item.contact_id), [dataFavorite])
@@ -107,7 +109,8 @@ const ContactList = (props: ContactListProps) => {
     if (!type) return contactData
     if (type === "favorite") return dataFavorite
 
-    return mergedData.filter(item => !listIdFavorite.includes(item.id))
+    // return mergedData.filter(item => !listIdFavorite.includes(item.id))
+    return contactData
   }, [mergedData, contactData, type, dataFavorite, listIdFavorite])
 
   const handleOpenModal = (contact: IContact) => {
@@ -136,7 +139,7 @@ const ContactList = (props: ContactListProps) => {
 
   if (filteredContactList.length === 0) {
     return (
-      <div css={baseContactListStyle}>
+      <div css={baseContactListStyle} data-testid="empty-state">
         <div className="empty-state">
           <p className="title">Hmm, no contact found 🤔</p>
           <p className="subtitle">Wanna create one?</p>
@@ -150,13 +153,14 @@ const ContactList = (props: ContactListProps) => {
 
   return (
     <>
-      <div css={baseContactListStyle}>
+      <div css={baseContactListStyle} data-testid="contact-card-wrapper">
         {filteredContactList?.map((item, idx) => (
           <ContactCard
             data={item as IContact}
             key={idx}
             type={type}
             onOpenModal={() => handleOpenModal(item as IContact)}
+            data-testid="card-container"
           />
         ))}
 

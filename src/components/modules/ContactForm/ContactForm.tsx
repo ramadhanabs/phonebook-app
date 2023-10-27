@@ -266,7 +266,7 @@ const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(
     }))
 
     return (
-      <div css={baseContactFormStyle}>
+      <div css={baseContactFormStyle} data-testid="contact-form">
         <form onSubmit={handleSubmit(onSubmit)} id="form">
           <div className="field-wrapper">
             <label htmlFor="contact-name">First Name</label>
@@ -282,7 +282,9 @@ const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(
               })}
             />
             {errors.first_name?.message && (
-              <label className="error">{errors.first_name?.message}</label>
+              <label data-testid="error-firstname" className="error">
+                {errors.first_name?.message}
+              </label>
             )}
           </div>
           <div className="field-wrapper">
@@ -299,7 +301,9 @@ const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(
               })}
             />
             {errors.last_name?.message && (
-              <label className="error">{errors.last_name?.message}</label>
+              <label data-testid="error-lastname" className="error">
+                {errors.last_name?.message}
+              </label>
             )}
           </div>
           <div className="field-wrapper">
@@ -327,7 +331,7 @@ const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(
               </div>
 
               {!isEditForm && (
-                <button type="button" onClick={handleAddNumber}>
+                <button type="button" onClick={handleAddNumber} data-testid="button-add-phone">
                   <PlusCircleIcon className="icon" />
                 </button>
               )}
@@ -345,6 +349,7 @@ const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(
                   placeholder="Contact Phone Number"
                   type="number"
                   disabled={isEditForm}
+                  data-testid={`phones.${index}.number`}
                   {...register(`phones.${index}.number`, { required: true })}
                 />
                 {!isEditForm && (

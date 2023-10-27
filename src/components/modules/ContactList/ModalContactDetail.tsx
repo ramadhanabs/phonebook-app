@@ -201,7 +201,11 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
           animate={{ opacity: 1 }}
           className="button-action-wrapper"
         >
-          <button className="action" onClick={handleRemoveFavorite}>
+          <button
+            className="action"
+            onClick={handleRemoveFavorite}
+            data-testid="button-remove-favorite"
+          >
             <div className="content-wrapper">
               <div className="icon-wrapper-delete">
                 <TrashIcon className="icon-delete" />
@@ -223,7 +227,7 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
           animate={{ opacity: 1 }}
           className="button-action-wrapper"
         >
-          <button className="action" onClick={handleFavorite}>
+          <button className="action" onClick={handleFavorite} data-testid="button-favorite">
             <div className="content-wrapper">
               <div className="icon-wrapper-edit">
                 <HeartIcon className="icon-edit" />
@@ -237,7 +241,11 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
             <ChevronRightIcon className="icon-chevron" />
           </button>
 
-          <button className="action" onClick={() => setDetailMode("edit")}>
+          <button
+            className="action"
+            onClick={() => setDetailMode("edit")}
+            data-testid="button-edit"
+          >
             <div className="content-wrapper">
               <div className="icon-wrapper-edit">
                 <PencilSquareIcon className="icon-edit" />
@@ -251,7 +259,11 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
             <ChevronRightIcon className="icon-chevron" />
           </button>
 
-          <button className="action" onClick={() => setDetailMode("delete")}>
+          <button
+            className="action"
+            onClick={() => setDetailMode("delete")}
+            data-testid="button-delete"
+          >
             <div className="content-wrapper">
               <div className="icon-wrapper-delete">
                 <TrashIcon className="icon-delete" />
@@ -275,6 +287,7 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="delete-action-wrapper"
+        data-testid="confirmation-delete"
       >
         <p className="title">Are you sure to delete this contact?</p>
 
@@ -300,11 +313,16 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
   }
 
   return (
-    <BottomSheetModal title="Detail Contact" isOpen={isOpen} onClose={onClose}>
+    <BottomSheetModal
+      title="Detail Contact"
+      isOpen={isOpen}
+      onClose={onClose}
+      data-testid="modal-detail-contact"
+    >
       <div css={baseBottomSheetStyle}>
         <div className="wrapper-contact-detail">
           <div className="wrapper-contact-card">
-            <ContactCard data={selectedContact} />
+            <ContactCard data={selectedContact}/>
           </div>
 
           <hr />

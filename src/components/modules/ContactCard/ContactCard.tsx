@@ -101,6 +101,7 @@ interface ContactCardProps {
   type?: ContactListType
   onOpenModal?: () => void
   data?: IContact
+  "data-testid"?: string
 }
 
 export const ContactCardLoader = () => (
@@ -120,16 +121,17 @@ export const ContactCardLoader = () => (
 const ContactCard = (props: ContactCardProps) => {
   const phoneList: Phone[] = useMemo(() => {
     const contact = props.data as unknown as IContactDB
-    if (contact.contact_id && contact.phones) {
+    if (props.type === "favorite" && contact.contact_id && contact.phones) {
       return JSON.parse(contact.phones)
     }
 
     return props.data?.phones
   }, [props.data])
+
   if (!props.data) return <></>
   return (
     <div css={contactCardStyle}>
-      <div className="container" onClick={props.onOpenModal}>
+      <div className="container" onClick={props.onOpenModal} data-testid={props["data-testid"]}>
         <div className="accent"></div>
         <img src={fakeImage("thumbs")} width="32px" height="32px" alt="logo-phonebook-white" />
         <div>
