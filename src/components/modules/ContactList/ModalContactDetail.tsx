@@ -322,7 +322,7 @@ const ModalContactDetail = (props: ModalContactDetailProps) => {
       <div css={baseBottomSheetStyle}>
         <div className="wrapper-contact-detail">
           <div className="wrapper-contact-card">
-            <ContactCard data={selectedContact}/>
+            <ContactCard data={selectedContact} type={type} />
           </div>
 
           <hr />
