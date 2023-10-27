@@ -7,8 +7,6 @@ import client from "@/graphql/urql"
 import { Provider } from "urql"
 import { Toaster } from "react-hot-toast"
 
-import "slick-carousel/slick/slick-theme.css"
-import "slick-carousel/slick/slick.css"
 import ContainerMobile from "@/components/elements/ContainerMobile"
 import DesktopAppLayout from "@/components/layouts/DesktopAppLayout"
 import ContainerDesktop from "@/components/elements/ContainerDesktop"
