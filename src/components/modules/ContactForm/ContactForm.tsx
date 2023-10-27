@@ -5,13 +5,14 @@ import FormInputText from "@/components/elements/Forms/FormInputText"
 import { jsx, css } from "@emotion/react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { PlusCircleIcon, QuestionMarkCircleIcon, TrashIcon } from "@heroicons/react/24/solid"
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react"
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useMutation } from "urql"
+import { useMutation, useQuery } from "urql"
 import { POST_CONTACT, UPDATE_CONTACT, UPDATE_CONTACT_PHONE_NUMBER } from "@/graphql/mutations"
 import PrimaryButton from "@/components/elements/Button/PrimaryButton"
 import { toast } from "react-hot-toast"
-import { IContact, UpdateFormParamsType } from "@/types"
+import { ContactResponse, IContact, UpdateFormParamsType } from "@/types"
+import { GET_CONTACT_LIST } from "@/graphql/queries"
 
 const baseContactFormStyle = css`
   padding: 0px 16px 100px 16px;
@@ -164,6 +165,23 @@ export const variables = {
 
 const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(
   ({ isEditForm, onClose, data, refetch = () => {} }, ref) => {
+    const [result, reexecuteQuery] = useQuery<ContactResponse>({
+      query: GET_CONTACT_LIST,
+      variables: {
+        limit: 9999,
+        offset: 0,
+        order_by: {
+          created_at: "desc",
+        },
+      },
+    })
+    const { data: dataAllContact } = result
+
+    const listFirstName = useMemo(() => {
+      const data = dataAllContact?.contact ?? []
+      return data.map(item => item.first_name)
+    }, [dataAllContact])
+
     const [postContactResult, postContactMutation] = useMutation<any, FormValues>(POST_CONTACT)
     const [updateContactResult, updateContactMutation] = useMutation<
       any,
@@ -214,6 +232,11 @@ const ContactForm = forwardRef<ContactFormRef, ContactFormProps>(
     }
 
     const onSubmit = (formData: FormValues) => {
+      if (listFirstName.includes(formData.first_name)) {
+        toast.error("Firstname should be unique")
+        return
+      }
+
       if (isEditForm) {
         const formDataEdit = {
           first_name: formData.first_name,
