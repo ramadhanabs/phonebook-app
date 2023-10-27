@@ -19,9 +19,18 @@ const customJestConfig = {
     "@/composites/(.*)": "src/composites/$1",
     "@/helpers/(.*)": "src/helpers/$1",
     "@/hooks/(.*)": "src/hooks/$1",
+    "@/db/(.*)": "src/db/$1",
+    "^dexie$": require.resolve("dexie"),
   },
-  coveragePathIgnorePatterns: ["components/icons", "helpers"],
-  setupFiles: ["./src/tests/setupFiles.ts"],
+  coveragePathIgnorePatterns: [
+    "components/icons",
+    "helpers",
+    "db",
+    "hooks",
+    "tests",
+    "components/elements/ContentLoader",
+  ],
+  setupFilesAfterEnv: ["./src/tests/setupFiles.ts", "fake-indexeddb/auto"],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
