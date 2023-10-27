@@ -22,6 +22,22 @@ const heroStyle = css`
     font-size: 20px;
     font-weight: 700;
   }
+
+  .title-empty {
+    font-size: 16px;
+    text-align: center;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+  }
+
+  .subtitle-empty {
+    font-size: 12px;
+    text-align: center;
+    font-weight: 400;
+    color: white;
+    opacity: 70%;
+  }
 `
 
 const favoriteCardStyle = css`
@@ -143,7 +159,15 @@ const HeroSlider = ({ isMobile }: { isMobile?: boolean }) => {
 
   if (isLoading) return <Loader />
 
-  if (data.length === 0) return <></>
+  if (data.length === 0)
+    return (
+      <div css={heroStyle} style={{ borderRadius: !isMobile ? "8px" : "" }}>
+        <p className="title-empty">Currently you having no interest to anyone</p>
+        <p className="subtitle-empty">
+          Tag them as favorite one by clicking contact card below/beside!
+        </p>
+      </div>
+    )
 
   return (
     <div
@@ -155,7 +179,7 @@ const HeroSlider = ({ isMobile }: { isMobile?: boolean }) => {
         <img src="/your-favorite-contact.png" width="120px" />
         {cardRenderer()}
         <div css={lastFavoriteCardStyle}>
-          <p className="title">Wanna see other contacts?</p>
+          <p className="title">See other contacts?</p>
           <Link href="/favorite">
             <button>See All</button>
           </Link>
