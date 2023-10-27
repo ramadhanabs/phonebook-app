@@ -15,7 +15,7 @@ const MobileAppLayout = (props: PropsWithChildren) => {
   const { children } = props
   return (
     <>
-      <Header />
+      <Header isMobile />
       <div css={spacingStyle}>{children}</div>
       <NavigationMobile />
     </>
