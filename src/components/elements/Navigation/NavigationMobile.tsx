@@ -3,6 +3,11 @@
 
 import { jsx, css } from "@emotion/react"
 import { BookOpenIcon, BookmarkIcon, RectangleStackIcon } from "@heroicons/react/24/outline"
+import {
+  BookOpenIcon as BookOpenSolid,
+  BookmarkIcon as BookmarkSolid,
+  RectangleStackIcon as RectangleStackSolid,
+} from "@heroicons/react/24/solid"
 import Link from "next/link"
 import { useRouter } from "next/router"
 
@@ -47,18 +52,21 @@ const LIST_MENU = [
     label: "Contact",
     href: "/",
     icon: <BookOpenIcon css={[iconBaseStyle]} />,
+    iconActive: <BookOpenSolid css={[iconBaseStyle]} />,
   },
   {
     id: "contact-form",
     label: "Contact Form",
     href: "/contact-form",
     icon: <RectangleStackIcon css={[iconBaseStyle]} />,
+    iconActive: <RectangleStackSolid css={[iconBaseStyle]} />,
   },
   {
     id: "Favorite",
     label: "Favorite",
     href: "/favorite",
     icon: <BookmarkIcon css={[iconBaseStyle]} />,
+    iconActive: <BookmarkSolid css={[iconBaseStyle]} />,
   },
 ]
 
@@ -73,7 +81,7 @@ const NavigationMobile = () => {
           css={[anchorBaseStyle, item.href === router.pathname && anchorActiveStyle]}
           key={item.id}
         >
-          {item.icon}
+          {item.href === router.pathname ? item.iconActive : item.icon}
           <p>{item.label}</p>
         </Link>
       ))}
