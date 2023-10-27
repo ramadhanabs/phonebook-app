@@ -17,7 +17,7 @@ const ModalCreateContact = ({ isOpen, onClose }: ModalCreateContactProps) => {
   }, [isOpen])
 
   return (
-    <BottomSheetModal title="Add New Contact" isOpen={isOpen} onClose={onClose}>
+    <BottomSheetModal title="Add New Contact" isOpen={isOpen} onClose={onClose} data-testid="modal-create-contact">
       <ContactForm ref={formRef} onClose={onClose} />
     </BottomSheetModal>
   )
