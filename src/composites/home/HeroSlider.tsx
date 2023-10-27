@@ -108,7 +108,7 @@ const HeroSlider = () => {
       return (
         <>
           {Array.from(Array(5).keys()).map((_, idx) => (
-            <div css={favoriteCardStyle} key={idx}>
+            <div css={favoriteCardStyle} key={idx} data-testid="loader">
               <ContentLoader width="100%" height="120px" />
               <div className="content">
                 <ContentLoader height="8px" width="60px" />
@@ -142,7 +142,7 @@ const HeroSlider = () => {
   if (data.length === 0) return <></>
 
   return (
-    <div css={heroStyle}>
+    <div css={heroStyle} data-testid="favorite-contact-container">
       <div className="no-scrollbar" css={sliderWrapperStyle}>
         <img src="/your-favorite-contact.png" width="120px" />
         {cardRenderer()}
