@@ -113,7 +113,7 @@ const Header = () => {
   const contentResultRenderer = () => {
     if (!result.data) {
       return (
-        <div className="empty-state">
+        <div className="empty-state" data-testid="empty-state">
           <div>
             <p className="title">Search contact here 🔍</p>
             <p className="subtitle">Input by first name of contact</p>
@@ -148,6 +148,7 @@ const Header = () => {
         <div className="navbar-content-wrapper">
           <Image src="/logo.svg" width={120} height={30} alt="logo-phonebook" />
           <FormInputText
+            aria-label="Search Field"
             placeholder={isShowSearch ? "Type 'Enter' to search " : "Search by First Name"}
             onFocus={() => setIsShowSearch(true)}
             onBlur={() => setIsShowSearch(false)}
@@ -164,6 +165,7 @@ const Header = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.6 }}
                 className="search-menu-container"
+                data-testid="search-menu-container"
               >
                 {contentResultRenderer()}
               </motion.div>
