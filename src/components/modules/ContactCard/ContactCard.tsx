@@ -61,6 +61,10 @@ const contactCardStyle = css`
   .content {
     font-size: 14px;
     color: #6d7588;
+    max-width: 18ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .content-detail {
     color: #04a95b;
